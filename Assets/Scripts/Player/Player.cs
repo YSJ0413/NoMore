@@ -30,6 +30,7 @@ public class Player : MonoBehaviour {
         Vector3 direction = touchPos - transform.position;
         direction = direction.normalized;// direction.Normalize();//Vector의 길이 => 무조건 1로 만듦
         direction.z = 0;
+        direction /= direction.magnitude;
 
         Debug.Log(direction + " : " + moveSpeed);
 
@@ -61,13 +62,4 @@ public class Player : MonoBehaviour {
 
         return !hit.collider.CompareTag("Player"); //Player태그가 붙어있는 컬라이더와 충돌했으면 false05 반환
     }
-
-    /* 
-    private Vector3 CustomNomalize(Vector3 origin) 
-    {
-        if (origin.sqrMagnitude >= 1)
-            
-        return Vector3.zero;
-    }
-    */
 }

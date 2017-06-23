@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player3 : MonoBehaviour {
+public class Player4 : MonoBehaviour {
 
     Vector3 touchPos;
     Vector3 direction = new Vector3(0, 0, 0);
-    Vector2 mousePos;
 
     public float moveSpeed;
 
@@ -26,12 +25,16 @@ public class Player3 : MonoBehaviour {
 
     private void Move()
     {
-        touchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-
         if (Input.GetMouseButtonDown(0))
+        {
             Rotate();
+            if (onTouch)
+                onTouch = false;
+            else
+                onTouch = true;
+        }
 
-        if (!CanMove()) return;
+        if (!onTouch) return;
 
         //transform.Translate(direction * moveSpeed *Time.deltaTime);
 
@@ -42,7 +45,7 @@ public class Player3 : MonoBehaviour {
 
     private void Rotate()
     {
-        mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        touchPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         direction = touchPos - transform.position;
         direction.Normalize();//Vector의 길이 => 무조건 1로 만듦
@@ -51,6 +54,7 @@ public class Player3 : MonoBehaviour {
 
     private bool CanMove()
     {
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector3.back);
 

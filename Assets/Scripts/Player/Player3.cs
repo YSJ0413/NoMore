@@ -55,8 +55,8 @@ public class Player3 : MonoBehaviour {
     private void Rotate()
     {
         direction = touchPos - transform.position;
-        direction.Normalize();//Vector의 길이 => 무조건 1로 만듦
         direction.z = 0;
+        direction.Normalize();//Vector의 길이 => 무조건 1로 만듦
     }
 
     private bool CanMove_Down()

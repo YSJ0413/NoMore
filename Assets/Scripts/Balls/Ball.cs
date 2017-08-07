@@ -55,8 +55,8 @@ public class Ball : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D hit)
     {
-        if (bounceCount <= 0) Destroy(this.gameObject);
         bounceCount--;
+        if (bounceCount <= 0) Destroy(this.gameObject);
         direction = new Vector3(0, 0, 0);
         direction = transform.position - hit.transform.position;
         direction.Normalize();

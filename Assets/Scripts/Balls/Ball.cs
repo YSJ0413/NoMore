@@ -13,14 +13,12 @@ public class Ball : MonoBehaviour {
     
     bool canMove;
 
-	// Use this for initialization
 	void Start () {
         myrigid = GetComponent<Rigidbody2D>();
-        CircleCollider2D myCollider = GetComponent<CircleCollider2D>();
+
         StartCoroutine(StartDelay());
 	}
 	
-	// Update is called once per frame
 	void Update () {
         Move();
 	}
@@ -52,6 +50,7 @@ public class Ball : MonoBehaviour {
         yield return new WaitForSeconds(2f);
         canMove = true;
         SetDestination();
+        CircleCollider2D myCollider = GetComponent<CircleCollider2D>();
     }
 
     void OnTriggerEnter2D(Collider2D hit)

@@ -77,8 +77,6 @@ public class Player3 : MonoBehaviour {
 
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector3.back);
 
-        Debug.Log(hit.collider);
-
         if (hit.collider == null) return true;
 
         return !hit.collider.CompareTag("Player"); //Player태그가 붙어있는 컬라이더와 충돌했으면 false05 반환

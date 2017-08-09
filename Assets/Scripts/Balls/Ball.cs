@@ -8,6 +8,7 @@ public class Ball : MonoBehaviour {
     public Transform player;
     public float moveSpeed = 10;
     public int bounceCount = 5;
+    public bool inViewport = false;
 
     Vector3 direction;
     
@@ -20,6 +21,7 @@ public class Ball : MonoBehaviour {
 	}
 	
 	void Update () {
+
         Move();
 	}
 
@@ -51,15 +53,28 @@ public class Ball : MonoBehaviour {
         canMove = true;
         SetDestination();
         CircleCollider2D myCollider = GetComponent<CircleCollider2D>();
-    }
+        yield return new WaitForSeconds(0.5f);
+        inViewport = true;
+}
 
     void OnTriggerEnter2D(Collider2D hit)
     {
+        if (!inViewport) return;
+
+        if (hit.tag == "Player") Debug.Log("GameOver");
+
         bounceCount--;
+
         if (bounceCount <= 0) Destroy(this.gameObject);
-        direction = new Vector3(0, 0, 0);
-        direction = transform.position - hit.transform.position;
-        direction.Normalize();
+
+        if(hit.tag == "Wall")
+            SetDestination();
+        else
+        {
+            direction = new Vector3(0, 0, 0);
+            direction = transform.position - hit.transform.position;
+            direction.Normalize();
+        }
     }
 
     

@@ -29,16 +29,17 @@ public class Player : MonoBehaviour {
 
         Vector3 direction = touchPos - transform.position;
         direction = direction.normalized;// direction.Normalize();//Vector의 길이 => 무조건 1로 만듦
-        direction.z = 0;
-        direction /= direction.magnitude;
+        direction.z = 0; //Z축을 0으로 고정 시킴
+        direction /= direction.magnitude; //
 
-        Debug.Log(direction + " : " + moveSpeed);
+        Debug.Log(direction + " : " + moveSpeed);// direction:moveSpeed로 결과봄
+        
 
         //transform.Translate(direction * moveSpeed *Time.deltaTime);
 
-        Vector3 movePos = transform.position + (direction * moveSpeed * Time.deltaTime);
-        movePos.z = 0; 
-        transform.position = movePos;
+        Vector3 movePos = transform.position + (direction * moveSpeed * Time.deltaTime); //현 위치에 
+        movePos.z = 0; //z축 고정
+        transform.position = movePos; //현 위치를 movePos의 위치로 만들음
     }
 
     private void Rotate()
@@ -52,7 +53,7 @@ public class Player : MonoBehaviour {
 
     private bool CanMove()
     {
-        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition); //
 
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector3.back);
 

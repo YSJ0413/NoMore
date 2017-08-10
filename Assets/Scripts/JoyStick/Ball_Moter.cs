@@ -6,17 +6,15 @@ public class Ball_Moter : MonoBehaviour
 {
     public float moveSpeed = 15.0f;
     public float drag = 0.5f;
-    public float terminalRotationSpeed = 25.0f;
     public Vector3 MoveVector { set; get; }
     public VirtualJoystick joystick;
 
-    private Rigidbody thisRigidbody;
+    private Rigidbody2D thisRigidbody;
 
     void Start()
     {
-        thisRigidbody = gameObject.AddComponent<Rigidbody>();
-        thisRigidbody = GetComponent<Rigidbody>();
-        thisRigidbody.maxAngularVelocity = terminalRotationSpeed;
+        thisRigidbody = gameObject.AddComponent<Rigidbody2D>();
+        thisRigidbody = GetComponent<Rigidbody2D>();
         thisRigidbody.drag = drag;
     }
 
@@ -28,7 +26,7 @@ public class Ball_Moter : MonoBehaviour
     }
     private void Move()
     {
-        thisRigidbody.AddForce((MoveVector * moveSpeed));
+        thisRigidbody.velocity = MoveVector * moveSpeed;
     }
     private Vector3 PoolInput()
     {

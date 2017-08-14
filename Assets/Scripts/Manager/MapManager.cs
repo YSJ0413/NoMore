@@ -5,11 +5,15 @@ using UnityEngine;
 public class MapManager : MonoBehaviour {
 
     public Wall wall;
+    public GameObject backgroundImg;
 
-    private Wall[] wallObj = new Wall[4];
+    //private Wall[] wallObj = new Wall[4];
 
     void Start () {
-        for (int i = 0; i < wallObj.Length; i++)
+        wall = Instantiate(wall).GetComponent<Wall>();
+        wall.transform.localScale = new Vector3(1.8f, 1.3f, 1);
+        wall.transform.position = new Vector3(-0.07f, 0, 0);
+        /*for (int i = 0; i < wallObj.Length; i++)
         {
             wallObj[i] = Instantiate(wall).GetComponent<Wall>();
 
@@ -34,10 +38,9 @@ public class MapManager : MonoBehaviour {
                 default:
                     return;
             }
-        }
+        }*/
     }
 	
-	// Update is called once per frame
 	void Update () {
 		
 	}

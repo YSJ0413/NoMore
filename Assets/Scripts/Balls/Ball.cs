@@ -5,15 +5,16 @@ using UnityEngine;
 public class Ball : MonoBehaviour {
     Rigidbody2D myrigid;
 
-    Player playerScript;
+    Ball_Moter playerScript;
 
     public Sprite redBar;
     public Transform _player;
     public float moveSpeed = 10;
     public int bounceCount = 5;
     public bool inViewport = false;
-    
-    private 
+    public float redBallSpellDelay = 0.5f;
+
+    private bool blueBallSpell_sw = false;
 
     Vector3 direction;
     
@@ -48,7 +49,8 @@ public class Ball : MonoBehaviour {
     void LookatPlayer()
     {
         SetDestination();
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        Vector3 direction_c = direction;
+        float angle = Mathf.Atan2(direction_c.y, direction_c.x) * Mathf.Rad2Deg;
 
         Quaternion newRotation = Quaternion.AngleAxis(angle, Vector3.forward);
         transform.rotation = newRotation;
@@ -76,6 +78,11 @@ public class Ball : MonoBehaviour {
     {
         if (!inViewport) return;
 
+        if(blueBallSpell_sw)
+        {
+            return;
+        }
+
         if (hit.tag == "Player")
         {
             HitPlayer();
@@ -98,6 +105,27 @@ public class Ball : MonoBehaviour {
         }
     }
 
+    private void OnTriggerStay2D(Collider2D hit)
+    {
+        if (!blueBallSpell_sw) return;
+        float speedUp = 3f;
+        switch (hit.tag)
+        {
+            case "Red":
+            case "Blue":
+            case "Brown":
+                Ball hitBall = Instantiate(hit).GetComponent<Ball>();
+                hitBall.moveSpeed += speedUp;
+                break;
+            case "Player":
+                Ball_Moter hitPlayer = Instantiate(hit).GetComponent<Ball_Moter>();
+                hitPlayer.moveSpeed += speedUp;
+                break;
+            default:
+                return;
+        }
+    }
+
     void NoCount()
     {
         canMove = false;
@@ -111,10 +139,11 @@ public class Ball : MonoBehaviour {
             case "Blue":
                 StartCoroutine(BlueBallEffect());
                 break;
-            case "Blown":
+            case "Brown":
                 Destroy(this.gameObject);
                 break;
             default:
+                Destroy(this.gameObject);
                 return;
         }
     }
@@ -129,18 +158,24 @@ public class Ball : MonoBehaviour {
                 break;
             case "Blue":
                 StartCoroutine(BlueBallEffect());
+                //Destroy(this.gameObject);
                 break;
-            case "Blown":
+            case "Brown":
                 StartCoroutine(BlownBallEffect());
+                //Destroy(this.gameObject);
                 break;
             default:
+                Debug.Log("GameOver");
+                Destroy(this.gameObject);
                 return;
         }
     } 
 
     IEnumerator RedBallEffect()
     {
-        for (int i = 0; i < 1000; i++)
+        yield return new WaitForSeconds(redBallSpellDelay);
+
+        for (int i = 0; i < 10000; i++)
         {
             transform.localScale += new Vector3(1, 0, 0);
             yield return new WaitForSeconds(0.005f);
@@ -151,7 +186,9 @@ public class Ball : MonoBehaviour {
     IEnumerator BlueBallEffect()
     {
         canMove = false;
+        transform.position += new Vector3(0, 0, 10);
         transform.localScale = new Vector3(5, 5, 1);
+        blueBallSpell_sw = true;
         yield return new WaitForSeconds(5f);
         Destroy(this.gameObject);
     }

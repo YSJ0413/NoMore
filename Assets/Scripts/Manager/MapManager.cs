@@ -5,7 +5,6 @@ using UnityEngine;
 public class MapManager : MonoBehaviour {
 
     public Wall wall;
-    public GameObject backgroundImg;
 
     //private Wall[] wallObj = new Wall[4];
 

@@ -6,6 +6,8 @@ public class SpawnManager : MonoBehaviour {
 
     private Transform ballsStorage;
 
+    public Sprite redBarSprite;
+
     public Ball[] balls; //공들 오브젝트 (기본공/ 특수공으로 구별해서 넣을거임)
     public Transform player;
     public float spawnDelay = 3;
@@ -40,7 +42,8 @@ public class SpawnManager : MonoBehaviour {
         ballObject.transform.position = GetRandomSpawnPoint();
         ballObject.inViewport = false;//공의 포지션을 플레이어 포지션으로 이동시킴.(초기화)
         ballObject.transform.SetParent(ballsStorage);//공의 부모를 ballsStorage로 함.
-        ballObject.player = player;//볼 오브젝트.플레이어랑 플레이어랑 햇갈리지 말것.(위에 선언한 플레이어를 확인할 것)
+        ballObject._player = player;//볼 오브젝트.플레이어랑 플레이어랑 햇갈리지 말것.(위에 선언한 플레이어를 확인할 것)
+        ballObject.redBar = redBarSprite;
         isSpawn = false;//3.펄스로 바꾸면서 코루틴 종료.
     }
 

@@ -63,4 +63,16 @@ public class Player : MonoBehaviour {
 
         return !hit.collider.CompareTag("Player"); //Player태그가 붙어있는 컬라이더와 충돌했으면 false05 반환
     }
+
+    public void HitBlown()
+    {
+        StartCoroutine(SpeedDown());
+    }
+
+    IEnumerator SpeedDown()
+    {
+        moveSpeed -= 5;
+        yield return new WaitForSeconds(3f);
+        moveSpeed += 5;
+    }
 }

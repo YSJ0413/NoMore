@@ -4,7 +4,7 @@ using System.Collections;
 
 public class Ball_Moter : MonoBehaviour
 {
-    public float moveSpeed = 15.0f;
+    public float moveSpeed = 10.0f;
     public float drag = 0.5f;
     public Vector3 MoveVector { set; get; }
     public VirtualJoystick joystick;

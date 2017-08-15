@@ -5,6 +5,8 @@ using UnityEngine;
 public class Ball : MonoBehaviour {
     Rigidbody2D myrigid;
 
+    CircleCollider2D myColider;
+
     Ball_Moter playerScript;
 
     public Sprite redBar;
@@ -22,7 +24,7 @@ public class Ball : MonoBehaviour {
 
 	void Start () {
         myrigid = GetComponent<Rigidbody2D>();
-
+        myColider = GetComponent<CircleCollider2D>();
         StartCoroutine(StartDelay());
 	}
 	
@@ -69,7 +71,6 @@ public class Ball : MonoBehaviour {
         yield return new WaitForSeconds(2f);
         canMove = true;
         SetDestination();
-        CircleCollider2D myCollider = GetComponent<CircleCollider2D>();
         yield return new WaitForSeconds(0.5f);
         inViewport = true;
 }
@@ -107,23 +108,50 @@ public class Ball : MonoBehaviour {
 
     private void OnTriggerStay2D(Collider2D hit)
     {
+
         if (!blueBallSpell_sw) return;
-        float speedUp = 3f;
+
+
+        float speed = 0.3f;
         switch (hit.tag)
         {
             case "Red":
             case "Blue":
             case "Brown":
-                Ball hitBall = Instantiate(hit).GetComponent<Ball>();
-                hitBall.moveSpeed += speedUp;
+                Ball hitBall = FindObjectOfType<Ball>();
+                if (hit == hitBall)
+                    hitBall.moveSpeed += speed;
                 break;
             case "Player":
-                Ball_Moter hitPlayer = Instantiate(hit).GetComponent<Ball_Moter>();
-                hitPlayer.moveSpeed += speedUp;
+                Ball_Moter hitPlayer = FindObjectOfType<Ball_Moter>();
+                hitPlayer.moveSpeed += speed;
                 break;
             default:
                 return;
         }
+    }
+    private void OnTriggerExit2D(Collider2D hit)
+    {
+        if (!blueBallSpell_sw) return;
+
+        float speed = 0.3f;
+        switch (hit.tag)
+        {
+            case "Red":
+            case "Blue":
+            case "Brown":
+                Ball hitBall = FindObjectOfType<Ball>();
+                if (hit == hitBall)
+                    hitBall.moveSpeed -= speed;
+                break;
+            case "Player":
+                Ball_Moter hitPlayer = FindObjectOfType<Ball_Moter>();
+                hitPlayer.moveSpeed -= speed;
+                break;
+            default:
+                return;
+        }
+
     }
 
     void NoCount()
@@ -166,7 +194,7 @@ public class Ball : MonoBehaviour {
                 break;
             default:
                 Debug.Log("GameOver");
-                Destroy(this.gameObject);
+                //Destroy(this.gameObject);
                 return;
         }
     } 
@@ -188,16 +216,27 @@ public class Ball : MonoBehaviour {
         canMove = false;
         transform.position += new Vector3(0, 0, 10);
         transform.localScale = new Vector3(5, 5, 1);
+        myColider.radius = 0.7f;
         blueBallSpell_sw = true;
         yield return new WaitForSeconds(5f);
+        transform.localScale = new Vector3(0, 0, 0);
+        myColider.radius = 0f;
+        yield return new WaitForSeconds(0.5f);
         Destroy(this.gameObject);
     }
 
     IEnumerator BlownBallEffect()
     {
+        Ball_Moter hitPlayer = FindObjectOfType<Ball_Moter>();
+
+        float speed = 2f;
+
         transform.localScale = new Vector3(0, 0, 0);
+        hitPlayer.moveSpeed -= speed;
+        myColider.radius = 0f;
         //playerScript.HitBlown();
         yield return new WaitForSeconds(3.5f);
+        hitPlayer.moveSpeed +=2;
         Destroy(this.gameObject);
     }
 }

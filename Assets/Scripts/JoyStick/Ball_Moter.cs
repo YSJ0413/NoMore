@@ -8,6 +8,7 @@ public class Ball_Moter : MonoBehaviour
     public float drag = 0.5f;
     public Vector3 MoveVector { set; get; }
     public VirtualJoystick joystick;
+    public bool onBlueEffect;
 
     private Rigidbody2D thisRigidbody;
 
@@ -24,10 +25,12 @@ public class Ball_Moter : MonoBehaviour
 
         Move();
     }
+
     private void Move()
     {
         thisRigidbody.velocity = MoveVector * moveSpeed;
     }
+
     private Vector3 PoolInput()
     {
         Vector3 dir = Vector3.zero;

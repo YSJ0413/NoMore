@@ -16,7 +16,25 @@ public class Ball : MonoBehaviour {
     public bool inViewport = false;
     public float redBallSpellDelay = 0.5f;
 
-    private bool blueBallSpell_sw = false;
+    public bool onBlueEffect;
+
+    public bool b_startBludEffect = false;
+
+    private bool r_redBallSpell_sw = false;
+
+    private bool b_blueBallSpell_sw = false;
+
+    private bool br_BrownBallEffect_sw = false;
+
+    private float b_tempBallSpeed;
+    private float b_tempPlayerSpeed;
+
+    private float br_tempPlayerSpeed;
+
+    private CircleCollider2D b_tempBallCollider;
+    private CircleCollider2D b_tempPlayerCollider;
+
+    private bool b_resetToSpeeds;
 
     Vector3 direction;
     
@@ -29,7 +47,6 @@ public class Ball : MonoBehaviour {
 	}
 	
 	void Update () {
-
         Move();
 	}
 
@@ -50,19 +67,28 @@ public class Ball : MonoBehaviour {
 
     void LookatPlayer()
     {
+        if (r_redBallSpell_sw) return;
+
         SetDestination();
+
         Vector3 direction_c = direction;
+
         float angle = Mathf.Atan2(direction_c.y, direction_c.x) * Mathf.Rad2Deg;
 
         Quaternion newRotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
         transform.rotation = newRotation;
+
+        r_redBallSpell_sw = true;
 
     }
 
     void Move()
     {
         if (!canMove) return;
+
         direction.z = 0;
+
         transform.position += direction * moveSpeed * Time.deltaTime;
     }
 
@@ -78,85 +104,131 @@ public class Ball : MonoBehaviour {
     void OnTriggerEnter2D(Collider2D hit)
     {
         if (!inViewport) return;
-
-        if(blueBallSpell_sw)
+        //(공용) * 파란공이 효과가 터지면 else 쪽으로 넘어감. 
+        if (!b_blueBallSpell_sw)
         {
+            Ball hitBall = FindObjectOfType<Ball>();
+
+            if (hit.tag == "Blue" && hitBall.b_startBludEffect) return;
+
+            if (hit.tag == "Player")
+            {
+                HitPlayer();
+            }
+
+            bounceCount--;
+
+            if (bounceCount <= 0)
+            {
+                NoCount();
+            }
+
+            if (hit.tag == "Wall")
+                SetDestination();
+
+            else
+            {
+                direction = new Vector3(0, 0, 0);
+                direction = transform.position - hit.transform.position;
+                direction.Normalize();
+            }
+        }
+        //(파란공 전용) 효과가 터졌을시 
+        else
+        {
+            Ball hitBall = FindObjectOfType<Ball>();
+
+            Ball_Moter hitPlayer = FindObjectOfType<Ball_Moter>();
+
+            float speed = 0.3f;
+
+
+            if (b_resetToSpeeds)
+            {
+                hitPlayer.moveSpeed = b_tempPlayerSpeed;
+
+                if (hit == hitBall)
+                    hitBall.moveSpeed = b_tempBallSpeed;
+
+                return;
+            }
+
+            if (!hitPlayer.onBlueEffect)
+            {
+                b_tempPlayerSpeed = hitPlayer.moveSpeed;
+                hitPlayer.onBlueEffect = true;
+            }
+
+            if (hit == hitBall && !hitBall.onBlueEffect)
+            {
+                b_tempBallSpeed = hitBall.moveSpeed;
+                hitBall.onBlueEffect = true;
+            }
+
+            switch (hit.tag)
+            {
+                case "Red":
+                case "Blue":
+                case "Brown":
+                    if (hit == hitBall)
+                        hitBall.moveSpeed += speed;
+                    break;
+                case "Player":
+                    hitPlayer.moveSpeed += speed;
+                    break;
+                default:
+                    return;
+            }
+
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D hit)
+    {
+        Ball hitBall = FindObjectOfType<Ball>();
+
+        Ball_Moter hitPlayer = FindObjectOfType<Ball_Moter>();
+
+        if (!b_blueBallSpell_sw) return;
+
+        float speed = 3f;
+
+        if (b_resetToSpeeds)
+        {
+            hitPlayer.moveSpeed = b_tempPlayerSpeed;
+
+            hitPlayer.onBlueEffect = false;
+
+            if (hit == hitBall)
+            {
+                hitBall.moveSpeed = b_tempBallSpeed;
+
+                hitBall.onBlueEffect = false;
+            }
+
             return;
         }
 
-        if (hit.tag == "Player")
+        if (hitPlayer.onBlueEffect)
         {
-            HitPlayer();
+            hitPlayer.moveSpeed = b_tempPlayerSpeed;
+            hitPlayer.onBlueEffect = false;
         }
 
-        bounceCount--;
-
-        if (bounceCount <= 0)
+        if (hit == hitBall && hitBall.onBlueEffect)
         {
-            NoCount();
+            hitBall.moveSpeed = b_tempBallSpeed;
+            hitBall.onBlueEffect = false;
         }
 
-        if(hit.tag == "Wall")
-            SetDestination();
-        else
-        {
-            direction = new Vector3(0, 0, 0);
-            direction = transform.position - hit.transform.position;
-            direction.Normalize();
-        }
-    }
-
-    private void OnTriggerStay2D(Collider2D hit)
-    {
-
-        if (!blueBallSpell_sw) return;
-
-
-        float speed = 0.3f;
-        switch (hit.tag)
-        {
-            case "Red":
-            case "Blue":
-            case "Brown":
-                Ball hitBall = FindObjectOfType<Ball>();
-                if (hit == hitBall)
-                    hitBall.moveSpeed += speed;
-                break;
-            case "Player":
-                Ball_Moter hitPlayer = FindObjectOfType<Ball_Moter>();
-                hitPlayer.moveSpeed += speed;
-                break;
-            default:
-                return;
-        }
-    }
-    private void OnTriggerExit2D(Collider2D hit)
-    {
-        if (!blueBallSpell_sw) return;
-
-        float speed = 0.3f;
-        switch (hit.tag)
-        {
-            case "Red":
-            case "Blue":
-            case "Brown":
-                Ball hitBall = FindObjectOfType<Ball>();
-                if (hit == hitBall)
-                    hitBall.moveSpeed -= speed;
-                break;
-            case "Player":
-                Ball_Moter hitPlayer = FindObjectOfType<Ball_Moter>();
-                hitPlayer.moveSpeed -= speed;
-                break;
-            default:
-                return;
-        }
-
+        if (hitPlayer.moveSpeed == 0)
+            Debug.Log("Error: Player's moveSpeed is zero.");
     }
 
     void NoCount()
     {
         canMove = false;
+
         switch(this.tag)
         {
             case "Red":
@@ -165,11 +237,10 @@ public class Ball : MonoBehaviour {
                 StartCoroutine(RedBallEffect());
                 break;
             case "Blue":
+                b_startBludEffect = true;
                 StartCoroutine(BlueBallEffect());
                 break;
             case "Brown":
-                Destroy(this.gameObject);
-                break;
             default:
                 Destroy(this.gameObject);
                 return;
@@ -185,16 +256,14 @@ public class Ball : MonoBehaviour {
                 Destroy(this.gameObject);
                 break;
             case "Blue":
-                StartCoroutine(BlueBallEffect());
-                //Destroy(this.gameObject);
+                b_startBludEffect = true;
+                bounceCount = 0;
                 break;
             case "Brown":
-                StartCoroutine(BlownBallEffect());
-                //Destroy(this.gameObject);
+                StartCoroutine(BrownBallEffect());
                 break;
             default:
                 Debug.Log("GameOver");
-                //Destroy(this.gameObject);
                 return;
         }
     } 
@@ -203,40 +272,77 @@ public class Ball : MonoBehaviour {
     {
         yield return new WaitForSeconds(redBallSpellDelay);
 
-        for (int i = 0; i < 10000; i++)
+        myColider.enabled = false;
+
+        BoxCollider2D redEffectCollider = GetComponent<BoxCollider2D>();
+
+        redEffectCollider.enabled = true;
+
+        for (int i = 0; i < 80; i++)
         {
             transform.localScale += new Vector3(1, 0, 0);
             yield return new WaitForSeconds(0.005f);
         }
-        //Destroy(this.gameObject);
+
+        Destroy(this.gameObject);
     }
 
     IEnumerator BlueBallEffect()
     {
         canMove = false;
-        transform.position += new Vector3(0, 0, 10);
-        transform.localScale = new Vector3(5, 5, 1);
+
         myColider.radius = 0.7f;
-        blueBallSpell_sw = true;
+
+        transform.position += new Vector3(0, 0, 10);
+
+        transform.localScale = new Vector3(5, 5, 1);
+
+        b_blueBallSpell_sw = true;
+
         yield return new WaitForSeconds(5f);
+
         transform.localScale = new Vector3(0, 0, 0);
+
         myColider.radius = 0f;
+
+        b_resetToSpeeds = true;
+
         yield return new WaitForSeconds(0.5f);
+
         Destroy(this.gameObject);
     }
 
-    IEnumerator BlownBallEffect()
+    IEnumerator BrownBallEffect()
     {
+
+        if (br_BrownBallEffect_sw) yield break;
+
+        br_BrownBallEffect_sw = true;
+
         Ball_Moter hitPlayer = FindObjectOfType<Ball_Moter>();
 
         float speed = 2f;
 
         transform.localScale = new Vector3(0, 0, 0);
+
+        br_tempPlayerSpeed = hitPlayer.moveSpeed;
+
         hitPlayer.moveSpeed -= speed;
+
         myColider.radius = 0f;
-        //playerScript.HitBlown();
+        yield return new WaitForSeconds(0.005f);
+
+        Debug.Log("Speed Down");
+
         yield return new WaitForSeconds(3.5f);
-        hitPlayer.moveSpeed +=2;
+
+        hitPlayer.moveSpeed = br_tempPlayerSpeed;
+
+        Debug.Log("Speed return");
+
+        yield return new WaitForSeconds(5f);
+
         Destroy(this.gameObject);
+        
     }
 }

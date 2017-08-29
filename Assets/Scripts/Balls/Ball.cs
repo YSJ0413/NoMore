@@ -38,11 +38,12 @@ public class Ball : MonoBehaviour {
 
     Vector3 direction;
     
-    bool canMove;
+    bool canMove = true;
 
 	void Start () {
         myrigid = GetComponent<Rigidbody2D>();
         myColider = GetComponent<CircleCollider2D>();
+        SetDestination();
         StartCoroutine(StartDelay());
 	}
 	
@@ -94,12 +95,9 @@ public class Ball : MonoBehaviour {
 
     IEnumerator StartDelay()
     {
-        yield return new WaitForSeconds(2f);
-        canMove = true;
-        SetDestination();
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.8f);
         inViewport = true;
-}
+    }
 
     void OnTriggerEnter2D(Collider2D hit)
     {
